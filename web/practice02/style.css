@@ -1,0 +1,28 @@
+/* Сплошная граница 1px и цветом #ccc,
+   внутренний отступ сверху и снизу 5px,
+   внутренний отступ слева и справа 10px
+*/
+.table td, .table th {
+    border: 4px solid #ccc;
+    padding: 5px 10px;
+}
+
+/* Объединить границы ближайших столбцов,
+   Ширина таблицы 500px
+*/
+.table {
+    border-collapse: collapse;
+    width: 500px;
+}
+
+/* Цвет фона #f0f1f4 */
+.table thead {
+    background-color: #f0f1f4;
+}
+
+/* Фон #121212, Текст #fff, прижать к правому */
+.table tfoot {
+    background-color: #121212;
+    color: #fff;
+    text-align: right;
+}
