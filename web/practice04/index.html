@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Practice 04</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main>
+    <form>
+      <!-- Full name -->
+      <div class="grid">
+        <div class="row-1col">
+          <div class="col">
+            <h4>Full name</h4>
+          </div>
+        </div>
+        <div class="row-2col">
+          <div class="col">
+            <label for="firstName"></label>
+            <input type="text" id="firstName" name="firstName" placeholder="First name">
+          </div>
+          <div class="col">
+            <label for="lastName"></label>
+            <input type="text" id="lastName" name="lastName" placeholder="Last name">
+          </div>
+        </div>
+      </div>
+
+      <!-- Address -->
+      <div class="grid">
+        <div class="row-1col">
+          <div class="col">
+            <h4>Address</h4>
+          </div>
+        </div>
+        <div class="row-1col">
+          <div class="col">
+            <label for="streetAddress"></label>
+            <input type="text" id="streetAddress" name="streetAddress" placeholder="Street address">
+          </div>
+        </div>
+        <div class="row-3col">
+          <div class="col">
+            <label for="city"></label>
+            <input type="text" id="city" name="city" placeholder="City">
+          </div>
+          <div class="col">
+            <label for="state"></label>
+            <input type="text" id="state" name="state" placeholder="State">
+          </div>
+          <div class="col">
+            <label for="zipCode"></label>
+            <input type="text" id="zipCode" name="zipCode" placeholder="ZIP code">
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact -->
+      <div class="grid">
+        <div class="row-1col">
+          <div class="col">
+            <h4>Contact information</h4>
+          </div>
+        </div>
+        <div class="row-2col">
+          <div class="col">
+            <label for="email"></label>
+            <input type="email" id="email" name="email" placeholder="Email*">
+          </div>
+          <div class="col">
+            <label for="phone"></label>
+            <input type="tel" id="phone" name="phone" placeholder="Phone">
+          </div>
+        </div>
+      </div>
+
+      <!-- Message text area -->
+      <div class="grid">
+        <div class="row-1col">
+          <div class="col">
+            <h4>Questions / Comments</h4>
+          </div>
+        </div>
+        <div class="row-1col">
+          <div class="col">
+            <label for="message"></label>
+            <textarea id="message" name="message" placeholder="Message*"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Subscription checkbox -->
+      <div class="grid">
+        <div class="row-1col">
+          <div class="col" style="display: flex; align-items: center;">
+            <input type="checkbox" class="checkbox" id="sub" name="sub">
+            <label for="sub">Update me on deals and special offers via email.</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Submit button -->
+      <div class="grid">
+        <div class="row-3col">
+          <div class="col">
+            <input type="submit" value="Submit">
+          </div>
+        </div>
+      </div>
+
+    </form>
+  </main>
+</body>
+</html>

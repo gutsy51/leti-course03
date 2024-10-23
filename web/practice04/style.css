@@ -1,0 +1,63 @@
+/* Main */
+body {
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+}
+h4 {
+    font-weight: bold;
+    font-size: 18px;
+    margin-top: 30px;
+    margin-bottom: 5px;
+}
+form {
+    max-width: 400px;
+    margin: 50px auto;
+    padding: 20px;
+    box-shadow: #9f9f9f 0 0 5px;
+    border-radius: 10px;
+}
+
+
+/* Inputs */
+input::placeholder, textarea::placeholder {
+    color: #8e8e8e;
+}
+input:not([type="checkbox"]), textarea {
+    background-color: #f6f6f6;
+    border: none;
+    border-radius: 5px;
+    padding: 10px;
+    width: 100%;
+}
+textarea {
+    resize: none;
+    height: 50px;
+}
+input[type="submit"] {
+    font-weight: bold;
+    color: #f0f1f4;
+    background-color: #222222;
+    border: none;
+    border-radius: 5px;
+}
+
+
+/* Grid */
+.grid {
+    display: grid;
+}
+.row-1col {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+}
+.row-2col {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+}
+.row-3col {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+}
+.col {
+    padding: 2px 15px 10px 15px;
+}

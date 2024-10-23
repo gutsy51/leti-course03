@@ -1,0 +1,78 @@
+body {
+    width: 980px;
+    margin: 0 auto;
+}
+
+header {
+    height: 29px;
+    width: 980px;
+    background-color: lightblue;
+}
+
+nav {
+    display: flex;
+    height: 102px;
+}
+
+.logo {
+    width: 280px;
+    background-color: lightgreen;
+}
+
+.menu {
+    width: 700px;
+    background-color: lightpink;
+}
+
+main {
+    width: 980px;
+}
+
+.description {
+    height: 135px;
+    background-color: lightcoral;
+}
+
+.container {
+    display: flex;
+}
+
+.news {
+    width: 350px;
+    background-color: lightskyblue;
+
+}
+
+.info {
+    width: 630px;
+    background-color: lightgreen;
+}
+
+aside {
+    height: 296px;
+    display: flex;
+}
+
+.subs {
+    width: 350px;
+    background-color: red;
+}
+
+.links {
+    width: 200px;
+    background-color: green;
+}
+
+.media {
+    width: 200px;
+    background-color: pink;
+}
+
+.addr {
+    width: 230px;
+    background-color: blue;
+}
+
+footer {
+    background-color: lightgray;
+}
