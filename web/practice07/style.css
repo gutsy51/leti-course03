@@ -1,5 +1,17 @@
 header {
     text-align: center;
+    @media (min-width: 801px) {
+        color: red;
+        font-size: 14px;
+    }
+    @media (min-width: 481px) and (max-width: 800px) {
+        color: green;
+        font-size: 10px;
+    }
+    @media (max-width: 480px) {
+        color: blue;
+        font-size: 6px;
+    }
 }
 
 main {
@@ -16,40 +28,28 @@ img {
     border-radius: 10px;
 }
 
+p {
+    @media (min-width: 801px) { color: red; }
+    @media (min-width: 481px) and (max-width: 800px) { color: green; }
+    @media (max-width: 480px) { color: blue; }
+}
+
 .card {
     min-width: 150px;
     box-shadow: #9f9f9f 0 0 2px;
     border-radius: 8px;
     padding: 10px;
     margin: 5px;
-}
-
-@media (min-width: 801px) {
-    /* Devices with width > 800px - 3 cards in a row */
-    .card {
+    @media (min-width: 801px) {
         flex: 0 1 29%;
+        margin-left: 10px;
     }
-    p {
-        color: red;
-    }
-}
-
-@media (min-width: 481px) and (max-width: 800px) {
-    /* Devices with 480 < width < 800px - 2 cards in a row */
-    .card {
+    @media (min-width: 481px) and (max-width: 800px) {
         flex: 0 1 43%;
+        margin-left: 15px;
     }
-    p {
-        color: green;
-    }
-}
-
-@media (max-width: 480px) {
-    /* Devices with width < 480px - 1 card in a row */
-    .card {
+    @media (max-width: 480px) {
         flex: 0 1 90%;
-    }
-    p {
-        color: blue;
+        margin-left: 20px
     }
 }
