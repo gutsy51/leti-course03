@@ -51,7 +51,7 @@ class Mark(models.Model):
     )
 
     def __str__(self):
-        return f'{self.mark or "N"}'
+        return f'Оценка студента {self.student} по дисциплине {self.subject}: {self.mark or "N"}'
 
     class Meta:
         managed = False
