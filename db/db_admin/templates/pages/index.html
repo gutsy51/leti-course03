@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}
+  Dashboard
+{% endblock %}
+
+{% block content %}
+  <div class="card shadow-lg border-0 rounded col-md-4">
+    <div class="card-body">
+      {% if user.is_authenticated %}
+        <div class="text-center mb-4">
+          <h5 class="card-title mb-2">{{ user.last_name }} {{ user.first_name }}</h5>
+          <p class="card-subtitle text-muted">{{ user.groups.first.name|default:"Нет группы" }}</p>
+        </div>
+
+        <div class="d-grid gap-3 mb-4">
+          <a href="{% url 'admin:index' %}" class="btn btn-secondary">База данных</a>
+          <a href="{% url 'db_admin_app:student_count' %}" class="btn btn-primary">Количество студентов по форме обучения</a>
+          <a href="{% url 'db_admin_app:subject_details' %}" class="btn btn-primary">Отчет по дисциплине</a>
+          <a href="{% url 'db_admin_app:generate_student_report' %}" class="btn btn-success">Справка об успеваемости</a>
+        </div>
+
+        <br><br><br><br>
+
+        <div class="position-absolute end-0 bottom-0 m-3 d-flex flex-column">
+          <a href="{% url 'password_change' %}" class="btn btn-secondary mb-2">Сменить пароль</a>
+          <a href="{% url 'logout' %}" class="btn btn-danger mb-2">Выйти</a>
+        </div>
+      {% else %}
+        <p class="text-center">Вы не авторизованы</p>
+        <div class="text-center">
+          <a href="{% url 'login' %}" class="btn btn-outline-primary">Войти</a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}

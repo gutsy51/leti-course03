@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  Информация о дисциплине
+{% endblock %}
+
+{% block content %}
+  <div class="card shadow-lg border-0 rounded col-md-8">
+    <div class="card-body">
+      <h2>Информация о дисциплине</h2>
+      <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Показать</button>
+      </form>
+      {% if result %}
+        <div class="alert alert-success mt-3">{{ result }}</div>
+      {% endif %}
+      <a href="{% url 'db_admin_app:index' %}" class="btn btn-secondary mt-3">На главную</a>
+    </div>
+  </div>
+{% endblock %}
