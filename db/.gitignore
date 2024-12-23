@@ -1,0 +1,6 @@
+cmake-build-debug/
+/unversioned/
+/.idea/
+/venv/
+*.user
+*.pyc
