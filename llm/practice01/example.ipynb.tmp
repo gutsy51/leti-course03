@@ -1,0 +1,1347 @@
+{
+ "nbformat": 4,
+ "nbformat_minor": 0,
+ "metadata": {
+  "colab": {
+   "provenance": [],
+   "authorship_tag": "ABX9TyMo8ChcmLfgDTzZ2q68kT+l"
+  },
+  "kernelspec": {
+   "name": "python3",
+   "display_name": "Python 3"
+  },
+  "language_info": {
+   "name": "python"
+  }
+ },
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "id": "DXaFa-NFN4MQ"
+   },
+   "source": [
+    "! pip install -q kaggle"
+   ],
+   "outputs": []
+  },
+  {
+   "cell_type": "code",
+   "source": [
+    "from google.colab import files\n",
+    "files.upload()"
+   ],
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 91
+    },
+    "id": "nlWpDAFXTc68",
+    "executionInfo": {
+     "status": "ok",
+     "timestamp": 1701531385587,
+     "user_tz": -180,
+     "elapsed": 31175,
+     "user": {
+      "displayName": "Алексей Медведев",
+      "userId": "00285943979098250409"
+     }
+    },
+    "outputId": "d0de76d7-151f-4a1d-dcc2-4492497ea4ad"
+   },
+   "execution_count": null,
+   "outputs": []
+  },
+  {
+   "cell_type": "code",
+   "source": [
+    "! mkdir ~/.kaggle\n",
+    "! cp kaggle.json ~/.kaggle/\n",
+    "! chmod 600 ~/.kaggle/kaggle.json"
+   ],
+   "metadata": {
+    "id": "Ezj72L7iTuMx",
+    "executionInfo": {
+     "status": "ok",
+     "timestamp": 1701531386004,
+     "user_tz": -180,
+     "elapsed": 427,
+     "user": {
+      "displayName": "Алексей Медведев",
+      "userId": "00285943979098250409"
+     }
+    },
+    "colab": {
+     "base_uri": "https://localhost:8080/"
+    },
+    "outputId": "f58e5f62-0a2e-46f4-e8c1-72ddd0dedfba"
+   },
+   "execution_count": null,
+   "outputs": []
+  },
+  {
+   "cell_type": "code",
+   "source": [
+    "! kaggle datasets download -d houcembenmansour/predict-diabetes-based-on-diagnostic-measures"
+   ],
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/"
+    },
+    "id": "JUy77dnOUIvz",
+    "executionInfo": {
+     "status": "ok",
+     "timestamp": 1701531386946,
+     "user_tz": -180,
+     "elapsed": 946,
+     "user": {
+      "displayName": "Алексей Медведев",
+      "userId": "00285943979098250409"
+     }
+    },
+    "outputId": "103dc841-9f8d-4650-9723-d13f2ec18574"
+   },
+   "execution_count": null,
+   "outputs": []
+  },
+  {
+   "cell_type": "code",
+   "source": [
+    "! unzip '/content/predict-diabetes-based-on-diagnostic-measures.zip' -d '/content/predict-diabetes-based-on-diagnostic-measures'"
+   ],
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/"
+    },
+    "id": "SCWyZaCcVtKx",
+    "executionInfo": {
+     "status": "ok",
+     "timestamp": 1701531397239,
+     "user_tz": -180,
+     "elapsed": 10301,
+     "user": {
+      "displayName": "Алексей Медведев",
+      "userId": "00285943979098250409"
+     }
+    },
+    "outputId": "a09b8e0e-b367-4247-82e3-389799a2b94e"
+   },
+   "execution_count": null,
+   "outputs": []
+  },
+  {
+   "cell_type": "code",
+   "source": [
+    "import numpy as np\n",
+    "import pandas as pd\n",
+    "from matplotlib import pyplot as plt\n",
+    "%matplotlib inline"
+   ],
+   "metadata": {
+    "id": "ZYppyROyWO3f"
+   },
+   "execution_count": null,
+   "outputs": []
+  },
+  {
+   "cell_type": "code",
+   "source": [
+    "df=pd.read_csv('/content/predict-diabetes-based-on-diagnostic-measures/diabetes.csv')\n",
+    "df.head()"
+   ],
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 206
+    },
+    "id": "mmYpbizDXDCl",
+    "executionInfo": {
+     "status": "ok",
+     "timestamp": 1701531397241,
+     "user_tz": -180,
+     "elapsed": 23,
+     "user": {
+      "displayName": "Алексей Медведев",
+      "userId": "00285943979098250409"
+     }
+    },
+    "outputId": "7719d02d-40db-483f-a63f-d427959d7a00"
+   },
+   "execution_count": null,
+   "outputs": []
+  },
+  {
+   "cell_type": "code",
+   "source": [
+    "target=df['diabetes']\n",
+    "df=df.drop(['diabetes'],axis=1)\n",
+    "df.head()"
+   ],
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 206
+    },
+    "id": "SQ08Ycz6YzQP",
+    "executionInfo": {
+     "status": "ok",
+     "timestamp": 1701531397242,
+     "user_tz": -180,
+     "elapsed": 21,
+     "user": {
+      "displayName": "Алексей Медведев",
+      "userId": "00285943979098250409"
+     }
+    },
+    "outputId": "a515f26d-585b-4f89-e509-db85f552bb6d"
+   },
+   "execution_count": null,
+   "outputs": []
+  },
+  {
+   "cell_type": "code",
+   "source": [
+    "target.value_counts()"
+   ],
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/"
+    },
+    "id": "oBR7GsEJZFJi",
+    "executionInfo": {
+     "status": "ok",
+     "timestamp": 1701531397243,
+     "user_tz": -180,
+     "elapsed": 19,
+     "user": {
+      "displayName": "Алексей Медведев",
+      "userId": "00285943979098250409"
+     }
+    },
+    "outputId": "3914b5b6-1d9c-46b7-b5f0-8720d259c286"
+   },
+   "execution_count": null,
+   "outputs": []
+  },
+  {
+   "cell_type": "code",
+   "source": [
+    "codes = {'No diabetes': 0, 'Diabetes': 1}\n",
+    "target=target.map(codes)\n",
+    "target.value_counts()"
+   ],
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/"
+    },
+    "id": "ttzH999zZL_v",
+    "executionInfo": {
+     "status": "ok",
+     "timestamp": 1701531397675,
+     "user_tz": -180,
+     "elapsed": 447,
+     "user": {
+      "displayName": "Алексей Медведев",
+      "userId": "00285943979098250409"
+     }
+    },
+    "outputId": "77510019-c9d7-46cc-b9d8-c7fabd5eeec5"
+   },
+   "execution_count": null,
+   "outputs": []
+  },
+  {
+   "cell_type": "code",
+   "source": [
+    "df=df.drop(['patient_number'],axis=1)\n",
+    "df.head()"
+   ],
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 206
+    },
+    "id": "dWJ8t4q6fDaS",
+    "executionInfo": {
+     "status": "ok",
+     "timestamp": 1701531397676,
+     "user_tz": -180,
+     "elapsed": 35,
+     "user": {
+      "displayName": "Алексей Медведев",
+      "userId": "00285943979098250409"
+     }
+    },
+    "outputId": "f172a934-75ff-4c3b-f953-2547f8d09318"
+   },
+   "execution_count": null,
+   "outputs": []
+  },
+  {
+   "cell_type": "code",
+   "source": [
+    "df.columns"
+   ],
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/"
+    },
+    "id": "UOAchRC5fiZB",
+    "executionInfo": {
+     "status": "ok",
+     "timestamp": 1701531397677,
+     "user_tz": -180,
+     "elapsed": 34,
+     "user": {
+      "displayName": "Алексей Медведев",
+      "userId": "00285943979098250409"
+     }
+    },
+    "outputId": "ba8e87de-968a-4fca-8e7c-570af0fc29bc"
+   },
+   "execution_count": null,
+   "outputs": []
+  },
+  {
+   "cell_type": "code",
+   "source": [
+    "df.isna().sum()"
+   ],
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/"
+    },
+    "id": "c8cTVfHGgdNT",
+    "executionInfo": {
+     "status": "ok",
+     "timestamp": 1701531397678,
+     "user_tz": -180,
+     "elapsed": 32,
+     "user": {
+      "displayName": "Алексей Медведев",
+      "userId": "00285943979098250409"
+     }
+    },
+    "outputId": "623558f8-f3a8-4580-862a-870404214bb1"
+   },
+   "execution_count": null,
+   "outputs": []
+  },
+  {
+   "cell_type": "code",
+   "source": [
+    "categ=['gender']\n",
+    "cont=[]\n",
+    "for col in df.columns:\n",
+    "  if col not in categ:\n",
+    "    cont.append(col)"
+   ],
+   "metadata": {
+    "id": "mfkuToGdhDIE"
+   },
+   "execution_count": null,
+   "outputs": []
+  },
+  {
+   "cell_type": "code",
+   "source": [
+    "categ"
+   ],
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/"
+    },
+    "id": "iqFTNvy4lfr8",
+    "executionInfo": {
+     "status": "ok",
+     "timestamp": 1701531397679,
+     "user_tz": -180,
+     "elapsed": 29,
+     "user": {
+      "displayName": "Алексей Медведев",
+      "userId": "00285943979098250409"
+     }
+    },
+    "outputId": "692a9069-1721-4eba-8f0a-020e35833dc9"
+   },
+   "execution_count": null,
+   "outputs": []
+  },
+  {
+   "cell_type": "code",
+   "source": [
+    "cont"
+   ],
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/"
+    },
+    "id": "SQUsbyFdlgoo",
+    "executionInfo": {
+     "status": "ok",
+     "timestamp": 1701531397680,
+     "user_tz": -180,
+     "elapsed": 27,
+     "user": {
+      "displayName": "Алексей Медведев",
+      "userId": "00285943979098250409"
+     }
+    },
+    "outputId": "6ff5cb1c-a999-4af7-a3db-15f38617837d"
+   },
+   "execution_count": null,
+   "outputs": []
+  },
+  {
+   "cell_type": "code",
+   "source": [
+    "for col in df.columns:\n",
+    "  print('{} : {}'.format(col, len(df[col].unique())))"
+   ],
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/"
+    },
+    "id": "8qa1pv1dlhOR",
+    "executionInfo": {
+     "status": "ok",
+     "timestamp": 1701531397680,
+     "user_tz": -180,
+     "elapsed": 24,
+     "user": {
+      "displayName": "Алексей Медведев",
+      "userId": "00285943979098250409"
+     }
+    },
+    "outputId": "13b2f4bf-6c9f-4b52-9da9-4d78b2822035"
+   },
+   "execution_count": null,
+   "outputs": []
+  },
+  {
+   "cell_type": "code",
+   "source": [
+    "for name in categ:\n",
+    "    dummies = pd.get_dummies(df[name], prefix=name, drop_first=False)\n",
+    "    df=pd.concat([df,dummies],axis=1)\n",
+    "df=df.drop(columns=categ)\n",
+    "df.head()"
+   ],
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 206
+    },
+    "id": "p72w9bM1mckh",
+    "executionInfo": {
+     "status": "ok",
+     "timestamp": 1701531397680,
+     "user_tz": -180,
+     "elapsed": 21,
+     "user": {
+      "displayName": "Алексей Медведев",
+      "userId": "00285943979098250409"
+     }
+    },
+    "outputId": "d978d056-d4bb-43ea-cfd9-b4e193157dc7"
+   },
+   "execution_count": null,
+   "outputs": []
+  },
+  {
+   "cell_type": "code",
+   "source": [
+    "def replace_comma(x):\n",
+    "  return float(x.replace(',','.'))\n",
+    "bad_cols=['chol_hdl_ratio','bmi', 'waist_hip_ratio']\n",
+    "for col in bad_cols:\n",
+    "  df[col]=df[col].map(lambda x: float(x.replace(',','.')))\n",
+    "df.head()"
+   ],
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 206
+    },
+    "id": "dgmfBMa6q4Dj",
+    "executionInfo": {
+     "status": "ok",
+     "timestamp": 1701531397982,
+     "user_tz": -180,
+     "elapsed": 321,
+     "user": {
+      "displayName": "Алексей Медведев",
+      "userId": "00285943979098250409"
+     }
+    },
+    "outputId": "ec3aabcf-932c-46a2-9c74-93ab025a65fb"
+   },
+   "execution_count": null,
+   "outputs": []
+  },
+  {
+   "cell_type": "code",
+   "source": [
+    "import seaborn as sns\n",
+    "fig=plt.figure(figsize=(20,10))\n",
+    "\n",
+    "for i, name in enumerate(cont):\n",
+    "    ax=fig.add_subplot(1,len(cont), i+1)\n",
+    "    sns.boxplot(y=df[name], ax=ax)\n",
+    "\n",
+    "fig.tight_layout()"
+   ],
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 717
+    },
+    "id": "rYzZFBxwoU-K",
+    "executionInfo": {
+     "status": "ok",
+     "timestamp": 1701531403430,
+     "user_tz": -180,
+     "elapsed": 5450,
+     "user": {
+      "displayName": "Алексей Медведев",
+      "userId": "00285943979098250409"
+     }
+    },
+    "outputId": "dd6bc186-5e5e-47b3-a660-45e585c297b7"
+   },
+   "execution_count": null,
+   "outputs": []
+  },
+  {
+   "cell_type": "code",
+   "source": [
+    "from sklearn.preprocessing import RobustScaler\n",
+    "rs = RobustScaler()\n",
+    "df[cont]=rs.fit_transform(df[cont])\n",
+    "df.head()"
+   ],
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 226
+    },
+    "id": "ioekLQVMsv_M",
+    "executionInfo": {
+     "status": "ok",
+     "timestamp": 1701531403430,
+     "user_tz": -180,
+     "elapsed": 17,
+     "user": {
+      "displayName": "Алексей Медведев",
+      "userId": "00285943979098250409"
+     }
+    },
+    "outputId": "94e8caf1-4c2a-4512-8248-461edf027ede"
+   },
+   "execution_count": null,
+   "outputs": []
+  },
+  {
+   "cell_type": "code",
+   "source": [
+    "rs.inverse_transform(df[cont])[:5,:]"
+   ],
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/"
+    },
+    "id": "qiAMgOQd2To5",
+    "executionInfo": {
+     "status": "ok",
+     "timestamp": 1701531403430,
+     "user_tz": -180,
+     "elapsed": 15,
+     "user": {
+      "displayName": "Алексей Медведев",
+      "userId": "00285943979098250409"
+     }
+    },
+    "outputId": "01250df5-6f16-4cfb-967c-6e93e3c30dc7"
+   },
+   "execution_count": null,
+   "outputs": []
+  },
+  {
+   "cell_type": "code",
+   "source": [
+    "import seaborn as sns\n",
+    "fig=plt.figure(figsize=(20,10))\n",
+    "\n",
+    "for i, name in enumerate(cont):\n",
+    "    ax=fig.add_subplot(1,len(cont), i+1)\n",
+    "    sns.boxplot(y=df[name], ax=ax)\n",
+    "\n",
+    "fig.tight_layout()"
+   ],
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 717
+    },
+    "id": "cEUqZRZVx0X1",
+    "executionInfo": {
+     "status": "ok",
+     "timestamp": 1701531408976,
+     "user_tz": -180,
+     "elapsed": 5556,
+     "user": {
+      "displayName": "Алексей Медведев",
+      "userId": "00285943979098250409"
+     }
+    },
+    "outputId": "fc4f2a79-83e7-4305-8ebb-7b6dfe384f83"
+   },
+   "execution_count": null,
+   "outputs": []
+  },
+  {
+   "cell_type": "code",
+   "source": [
+    "corr = df[cont].corr()\n",
+    "cmap = sns.diverging_palette(5, 250, as_cmap=True)\n",
+    "\n",
+    "def magnify():\n",
+    "    return [dict(selector=\"th\",\n",
+    "                 props=[(\"font-size\", \"7pt\")]),\n",
+    "            dict(selector=\"td\",\n",
+    "                 props=[('padding', \"0em 0em\")]),\n",
+    "            dict(selector=\"th:hover\",\n",
+    "                 props=[(\"font-size\", \"12pt\")]),\n",
+    "            dict(selector=\"tr:hover td:hover\",\n",
+    "                 props=[('max-width', '200px'),\n",
+    "                        ('font-size', '12pt')])\n",
+    "]\n",
+    "\n",
+    "corr.style.background_gradient(cmap, axis=1)\\\n",
+    "    .format(precision=3)\\\n",
+    "    .set_properties(**{'max-width': '80px', 'font-size': '12pt'})\\\n",
+    "    .set_caption(\"Корреляция непрерывных признаков\")\\\n",
+    "    .set_table_styles(magnify())"
+   ],
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 328
+    },
+    "id": "gUp7Ml4ux3al",
+    "executionInfo": {
+     "status": "ok",
+     "timestamp": 1701531408978,
+     "user_tz": -180,
+     "elapsed": 21,
+     "user": {
+      "displayName": "Алексей Медведев",
+      "userId": "00285943979098250409"
+     }
+    },
+    "outputId": "a923382d-8cff-410d-cdc4-7e1db1f2a31e"
+   },
+   "execution_count": null,
+   "outputs": []
+  },
+  {
+   "cell_type": "code",
+   "source": [
+    "X=df.values\n",
+    "y=target.values"
+   ],
+   "metadata": {
+    "id": "8hlTcxvo0uaQ"
+   },
+   "execution_count": null,
+   "outputs": []
+  },
+  {
+   "cell_type": "code",
+   "source": [
+    "from sklearn.utils.class_weight import compute_class_weight\n",
+    "class_weights = compute_class_weight(class_weight='balanced', classes=[0,1], y=y)\n",
+    "class_weights = np.array([x for x in class_weights], dtype=np.float32)\n",
+    "class_weights"
+   ],
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/"
+    },
+    "id": "ra6JLEkwKny1",
+    "executionInfo": {
+     "status": "ok",
+     "timestamp": 1701531763990,
+     "user_tz": -180,
+     "elapsed": 304,
+     "user": {
+      "displayName": "Алексей Медведев",
+      "userId": "00285943979098250409"
+     }
+    },
+    "outputId": "33cfc377-bd04-4cb5-92d9-df8932fae688"
+   },
+   "execution_count": null,
+   "outputs": []
+  },
+  {
+   "cell_type": "code",
+   "source": [
+    "from sklearn.model_selection import train_test_split\n",
+    "X_train, X_dum, y_train, y_dum=train_test_split(X,y, test_size=0.2)\n",
+    "X_val, X_test, y_val, y_test= train_test_split(X_dum, y_dum ,test_size=0.5)"
+   ],
+   "metadata": {
+    "id": "C0hlO7hd2CT_"
+   },
+   "execution_count": null,
+   "outputs": []
+  },
+  {
+   "cell_type": "code",
+   "source": [
+    "import torch\n",
+    "import torch.optim as optim\n",
+    "import torch.nn as nn\n",
+    "from torch.utils.data import Dataset, TensorDataset, DataLoader\n",
+    "import torchvision.transforms as T"
+   ],
+   "metadata": {
+    "id": "LXC9giQm5wt-"
+   },
+   "execution_count": null,
+   "outputs": []
+  },
+  {
+   "cell_type": "code",
+   "source": [
+    "device = 'cuda' if torch.cuda.is_available() else 'cpu' # вычисления на графическом процессоре, если возможно\n",
+    "device"
+   ],
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 35
+    },
+    "id": "Md-N1bCg6OoS",
+    "executionInfo": {
+     "status": "ok",
+     "timestamp": 1701531764688,
+     "user_tz": -180,
+     "elapsed": 20,
+     "user": {
+      "displayName": "Алексей Медведев",
+      "userId": "00285943979098250409"
+     }
+    },
+    "outputId": "c2293009-1323-4125-db76-542e662b1857"
+   },
+   "execution_count": null,
+   "outputs": []
+  },
+  {
+   "cell_type": "code",
+   "source": [
+    "class MyDataset(Dataset):\n",
+    "  def __init__(self, data, targets, transform=None):\n",
+    "      self.data = torch.Tensor(data)\n",
+    "      self.targets = torch.LongTensor(targets)\n",
+    "      self.transform = transform\n",
+    "\n",
+    "  def __getitem__(self, index):\n",
+    "      x = self.data[index]\n",
+    "      y = self.targets[index]\n",
+    "      return x, y\n",
+    "\n",
+    "  def get_labels(self):\n",
+    "    return self.targets\n",
+    "\n",
+    "  def __len__(self):\n",
+    "      return len(self.data)"
+   ],
+   "metadata": {
+    "id": "LBysrvxK6RbG"
+   },
+   "execution_count": null,
+   "outputs": []
+  },
+  {
+   "cell_type": "code",
+   "source": [
+    "train_dataset=MyDataset(X_train,y_train)\n",
+    "val_dataset=MyDataset(X_val,y_val)\n",
+    "test_dataset=MyDataset(X_test,y_test)"
+   ],
+   "metadata": {
+    "id": "4P2XVe3t6ZOg"
+   },
+   "execution_count": null,
+   "outputs": []
+  },
+  {
+   "cell_type": "code",
+   "source": [
+    "print(f'''Длина тестовой выборки: {len(test_dataset)}\n",
+    "Длина валидационной выборки: {len(val_dataset)}\n",
+    "Длина тренировочной выборки: {len(train_dataset)}''')"
+   ],
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/"
+    },
+    "id": "Lw5h805Z6n1K",
+    "executionInfo": {
+     "status": "ok",
+     "timestamp": 1701531764690,
+     "user_tz": -180,
+     "elapsed": 19,
+     "user": {
+      "displayName": "Алексей Медведев",
+      "userId": "00285943979098250409"
+     }
+    },
+    "outputId": "0ec40853-f810-40f6-ef64-1c92941c7d0a"
+   },
+   "execution_count": null,
+   "outputs": []
+  },
+  {
+   "cell_type": "code",
+   "source": [
+    "train_dataset[0]"
+   ],
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/"
+    },
+    "id": "bjdVIX6V6wwa",
+    "executionInfo": {
+     "status": "ok",
+     "timestamp": 1701531764690,
+     "user_tz": -180,
+     "elapsed": 15,
+     "user": {
+      "displayName": "Алексей Медведев",
+      "userId": "00285943979098250409"
+     }
+    },
+    "outputId": "5d54169a-8825-464e-87f8-7370dca8197c"
+   },
+   "execution_count": null,
+   "outputs": []
+  },
+  {
+   "cell_type": "code",
+   "source": [
+    "! pip install torchsampler"
+   ],
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/"
+    },
+    "id": "KmsnDjJjFEsJ",
+    "executionInfo": {
+     "status": "ok",
+     "timestamp": 1701531772269,
+     "user_tz": -180,
+     "elapsed": 7590,
+     "user": {
+      "displayName": "Алексей Медведев",
+      "userId": "00285943979098250409"
+     }
+    },
+    "outputId": "97b62222-f782-4200-d7ff-c8c41b4675fd"
+   },
+   "execution_count": null,
+   "outputs": []
+  },
+  {
+   "cell_type": "code",
+   "source": [
+    "from torchsampler import ImbalancedDatasetSampler"
+   ],
+   "metadata": {
+    "id": "K8p1BrtVFFiK"
+   },
+   "execution_count": null,
+   "outputs": []
+  },
+  {
+   "cell_type": "code",
+   "source": [
+    "batch_size=16 # размер пакета\n",
+    "train_loader = DataLoader(train_dataset, batch_size=batch_size,shuffle=False,\n",
+    "                          sampler=ImbalancedDatasetSampler(train_dataset))\n",
+    "val_loader = DataLoader(val_dataset, batch_size=batch_size,shuffle=True)\n",
+    "test_loader = DataLoader(test_dataset, batch_size=batch_size,shuffle=True)"
+   ],
+   "metadata": {
+    "id": "C7d1gBsf6-uB"
+   },
+   "execution_count": null,
+   "outputs": []
+  },
+  {
+   "cell_type": "code",
+   "source": [
+    "class Classification_Model_FFNN(nn.Module):\n",
+    "  def __init__(self, num_inputs, num_classes):\n",
+    "      super(Classification_Model_FFNN, self).__init__()\n",
+    "      self.pipe = nn.Sequential(\n",
+    "          nn.Linear(num_inputs, 64, bias=False),\n",
+    "          nn.ReLU6(inplace=True),\n",
+    "          nn.BatchNorm1d(64),\n",
+    "\n",
+    "          nn.Linear(64, 48, bias=False),\n",
+    "          nn.ReLU6(inplace=True),\n",
+    "          nn.BatchNorm1d(48),\n",
+    "\n",
+    "          nn.Linear(48, 32, bias=False),\n",
+    "          nn.ReLU6(inplace=True),\n",
+    "          nn.BatchNorm1d(32),\n",
+    "\n",
+    "          nn.Linear(32, 16, bias=False),\n",
+    "          nn.ReLU6(inplace=True),\n",
+    "          nn.BatchNorm1d(16),\n",
+    "\n",
+    "          nn.Linear(16, num_classes))\n",
+    "\n",
+    "  def forward(self, x):\n",
+    "      return self.pipe(x)"
+   ],
+   "metadata": {
+    "id": "lJxacKRv7Yc_"
+   },
+   "execution_count": null,
+   "outputs": []
+  },
+  {
+   "cell_type": "code",
+   "source": [
+    "model=Classification_Model_FFNN(15,2)\n",
+    "model.to(device);"
+   ],
+   "metadata": {
+    "id": "igoP1ZEH7zF4"
+   },
+   "execution_count": null,
+   "outputs": []
+  },
+  {
+   "cell_type": "code",
+   "source": [
+    "#! pip install torchinfo"
+   ],
+   "metadata": {
+    "id": "GfhlaWd98S41"
+   },
+   "execution_count": null,
+   "outputs": []
+  },
+  {
+   "cell_type": "code",
+   "source": [
+    "from torchinfo import summary\n",
+    "summary(model,input_size=(1, 15))"
+   ],
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/"
+    },
+    "id": "sMQt8DRn8U6w",
+    "executionInfo": {
+     "status": "ok",
+     "timestamp": 1701532600261,
+     "user_tz": -180,
+     "elapsed": 13,
+     "user": {
+      "displayName": "Алексей Медведев",
+      "userId": "00285943979098250409"
+     }
+    },
+    "outputId": "be224a24-c1f5-446d-aba8-c99f56ea72d9"
+   },
+   "execution_count": null,
+   "outputs": []
+  },
+  {
+   "cell_type": "code",
+   "source": [
+    "criterion = nn.CrossEntropyLoss(weight=torch.tensor(class_weights))\n",
+    "#criterion = nn.CrossEntropyLoss()\n",
+    "optimizer = optim.Adam(model.parameters(), weight_decay=0.1)"
+   ],
+   "metadata": {
+    "id": "FheuoNTw9eOm"
+   },
+   "execution_count": null,
+   "outputs": []
+  },
+  {
+   "cell_type": "code",
+   "source": [
+    "from tqdm import tqdm"
+   ],
+   "metadata": {
+    "id": "4c6W0J148Xnc"
+   },
+   "execution_count": null,
+   "outputs": []
+  },
+  {
+   "cell_type": "code",
+   "source": [
+    "def accuracy(predictions, labels):\n",
+    "    classes = torch.argmax(predictions, dim=1)\n",
+    "    return torch.mean((classes == labels).float())"
+   ],
+   "metadata": {
+    "id": "JduOOZDm9ag2"
+   },
+   "execution_count": null,
+   "outputs": []
+  },
+  {
+   "cell_type": "code",
+   "source": [
+    "train_losses=[]\n",
+    "train_accs=[]\n",
+    "def train(model,epoch):\n",
+    "  print('\\nEpoch : %d'%epoch)\n",
+    "  model.train() # веса модели можно обновлять\n",
+    "  running_loss= 0.\n",
+    "  running_acc = 0.\n",
+    "  for data in tqdm(train_loader):\n",
+    "      inputs, targets=data[0].to(device),data[1].to(device) # распаковываем пакеты\n",
+    "      optimizer.zero_grad() # обнуляем градиенты\n",
+    "      outputs=model(inputs) # считаем предсказания - прямой проход модели\n",
+    "      loss=criterion(outputs,targets) # ошибка пакета\n",
+    "      loss.backward() # обратное распространение ошибки\n",
+    "      optimizer.step() # итерация алгоритма оптимизации\n",
+    "\n",
+    "      running_loss += loss.item()\n",
+    "      running_acc += accuracy(outputs,targets)\n",
+    "\n",
+    "  train_loss=running_loss/len(train_loader)\n",
+    "  train_acc=running_acc/len(train_loader)\n",
+    "\n",
+    "  train_losses.append(train_loss)\n",
+    "  train_accs.append(train_acc)\n",
+    "  print('Средняя ошибка модели на тренировочной выборке: %.4f'%(train_loss)+'   Средняя точность модели на тренировочной выборке: %.4f'%(train_acc))"
+   ],
+   "metadata": {
+    "id": "w26AOOpl8wOj"
+   },
+   "execution_count": null,
+   "outputs": []
+  },
+  {
+   "cell_type": "code",
+   "source": [
+    "val_losses=[]\n",
+    "val_accs=[]\n",
+    "def val(model,epoch):\n",
+    "    print('\\nEpoch : %d'%epoch)\n",
+    "    model.eval() # веса модели заморожены\n",
+    "    running_loss = 0.\n",
+    "    running_acc = 0.\n",
+    "    with torch.no_grad(): # запрещаем переисывать градиенты\n",
+    "        for data in tqdm(val_loader):\n",
+    "            inputs, targets=data[0].to(device),data[1].to(device)\n",
+    "            outputs=model(inputs)\n",
+    "            loss=criterion(outputs,targets)\n",
+    "\n",
+    "            running_loss += loss.item()\n",
+    "            running_acc += accuracy(outputs,targets)\n",
+    "\n",
+    "        val_loss=running_loss/len(val_loader)\n",
+    "        val_acc=running_acc/len(val_loader)\n",
+    "\n",
+    "        val_losses.append(val_loss)\n",
+    "        val_accs.append(val_acc)\n",
+    "        print('Средняя ошибка модели на валидационной выборке: %.4f'%(val_loss)+'   Средняя точность модели на валидационной выборке: %.4f'%(val_acc))"
+   ],
+   "metadata": {
+    "id": "nMgDnLoa_Rgc"
+   },
+   "execution_count": null,
+   "outputs": []
+  },
+  {
+   "cell_type": "code",
+   "source": [
+    "class EarlyStopper:\n",
+    "    def __init__(self, patience=1, min_delta=0):\n",
+    "        self.patience = patience\n",
+    "        self.min_delta = min_delta\n",
+    "        self.counter = 0\n",
+    "        self.min_validation_loss = float('inf')\n",
+    "\n",
+    "    def early_stop(self, validation_loss):\n",
+    "        if validation_loss < self.min_validation_loss:\n",
+    "            self.min_validation_loss = validation_loss\n",
+    "            self.counter = 0\n",
+    "        elif validation_loss > (self.min_validation_loss + self.min_delta):\n",
+    "            self.counter += 1\n",
+    "            if self.counter >= self.patience:\n",
+    "                return True\n",
+    "        return False"
+   ],
+   "metadata": {
+    "id": "JEd35yW_EBA1"
+   },
+   "execution_count": null,
+   "outputs": []
+  },
+  {
+   "cell_type": "code",
+   "source": [
+    "max_epochs=100\n",
+    "best_acc=0.0\n",
+    "early_stopper = EarlyStopper(patience=5, min_delta=0.1)\n",
+    "for epoch in range(1,max_epochs+1):\n",
+    "    train(model,epoch)\n",
+    "    val(model,epoch)\n",
+    "    if val_accs[-1] > best_acc:\n",
+    "       torch.save(model, 'best-model.pt')\n",
+    "       best_acc = val_accs[-1]\n",
+    "    if early_stopper.early_stop(val_losses[-1]):\n",
+    "      break"
+   ],
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/"
+    },
+    "id": "jSkQYKcGAWg3",
+    "executionInfo": {
+     "status": "ok",
+     "timestamp": 1701532638115,
+     "user_tz": -180,
+     "elapsed": 1810,
+     "user": {
+      "displayName": "Алексей Медведев",
+      "userId": "00285943979098250409"
+     }
+    },
+    "outputId": "dd570472-9b53-42d9-cbee-fe39a1560881"
+   },
+   "execution_count": null,
+   "outputs": []
+  },
+  {
+   "cell_type": "code",
+   "source": [
+    "best_acc"
+   ],
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/"
+    },
+    "id": "rOEKuQJxPSKd",
+    "executionInfo": {
+     "status": "ok",
+     "timestamp": 1701532638116,
+     "user_tz": -180,
+     "elapsed": 9,
+     "user": {
+      "displayName": "Алексей Медведев",
+      "userId": "00285943979098250409"
+     }
+    },
+    "outputId": "7ae3de23-6c8b-4862-b6cf-d2f40bc95841"
+   },
+   "execution_count": null,
+   "outputs": []
+  },
+  {
+   "cell_type": "code",
+   "source": [
+    "plt.rcParams[\"figure.figsize\"] = (20,5)\n",
+    "plt.plot(train_losses,'-o')\n",
+    "plt.plot(val_losses,'-o')\n",
+    "plt.xlabel('эпоха')\n",
+    "plt.ylabel('ошибка')\n",
+    "plt.legend(['Обучение','Валидация'])\n",
+    "plt.title('Ошибка обучения vs Ошибка валидации')\n",
+    "plt.show()"
+   ],
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 425
+    },
+    "id": "sXqNxmW_Aabu",
+    "executionInfo": {
+     "status": "ok",
+     "timestamp": 1701532638466,
+     "user_tz": -180,
+     "elapsed": 354,
+     "user": {
+      "displayName": "Алексей Медведев",
+      "userId": "00285943979098250409"
+     }
+    },
+    "outputId": "3bbb8a19-62a1-469d-afb0-5f8b5b7a9f62"
+   },
+   "execution_count": null,
+   "outputs": []
+  },
+  {
+   "cell_type": "code",
+   "source": [
+    "plt.rcParams[\"figure.figsize\"] = (20,5)\n",
+    "plt.plot(train_accs,'-o')\n",
+    "plt.plot(val_accs,'-o')\n",
+    "plt.xlabel('эпоха')\n",
+    "plt.ylabel('точность')\n",
+    "plt.legend(['Обучение','Валидация'])\n",
+    "plt.title('Точность на обучении vs Точночть на валидации')\n",
+    "plt.show()"
+   ],
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 423
+    },
+    "id": "8KtcaXIzAmz-",
+    "executionInfo": {
+     "status": "ok",
+     "timestamp": 1701532639362,
+     "user_tz": -180,
+     "elapsed": 905,
+     "user": {
+      "displayName": "Алексей Медведев",
+      "userId": "00285943979098250409"
+     }
+    },
+    "outputId": "aaf3676a-92d0-4ba0-c095-e858e7bb4543"
+   },
+   "execution_count": null,
+   "outputs": []
+  },
+  {
+   "cell_type": "code",
+   "source": [
+    "model = torch.load('best-model.pt');\n",
+    "model.eval();"
+   ],
+   "metadata": {
+    "id": "JyEEPcyEOZ4n"
+   },
+   "execution_count": null,
+   "outputs": []
+  },
+  {
+   "cell_type": "code",
+   "source": [
+    "preds=[]\n",
+    "trgts=[]\n",
+    "with torch.no_grad():\n",
+    "  for data in tqdm(test_loader):\n",
+    "    inputs, targets=data[0].to(device),data[1].to(device)\n",
+    "    outputs=model(inputs)\n",
+    "    targets=targets.to('cpu').numpy()\n",
+    "    pred = outputs.data.max(1, keepdim=True)[1]\n",
+    "    pred = pred.to('cpu').numpy()\n",
+    "    trgts.append(targets)\n",
+    "    preds.append(pred)"
+   ],
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/"
+    },
+    "id": "9yeelxajAxHY",
+    "executionInfo": {
+     "status": "ok",
+     "timestamp": 1701532639364,
+     "user_tz": -180,
+     "elapsed": 21,
+     "user": {
+      "displayName": "Алексей Медведев",
+      "userId": "00285943979098250409"
+     }
+    },
+    "outputId": "0d415b20-6558-4a56-935a-928c3855b297"
+   },
+   "execution_count": null,
+   "outputs": []
+  },
+  {
+   "cell_type": "code",
+   "source": [
+    "targets=[x for sub in trgts for x in sub]\n",
+    "predictions=[x[0] for sub in preds for x in sub]\n",
+    "targets=np.array(targets)\n",
+    "predictions=np.array(predictions)"
+   ],
+   "metadata": {
+    "id": "K07efRrmDMsy"
+   },
+   "execution_count": null,
+   "outputs": []
+  },
+  {
+   "cell_type": "code",
+   "source": [
+    "from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay, f1_score\n",
+    "cm = confusion_matrix(targets, predictions)\n",
+    "ConfusionMatrixDisplay(cm).plot()"
+   ],
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 482
+    },
+    "id": "7lIuac-CDQuv",
+    "executionInfo": {
+     "status": "ok",
+     "timestamp": 1701532639896,
+     "user_tz": -180,
+     "elapsed": 544,
+     "user": {
+      "displayName": "Алексей Медведев",
+      "userId": "00285943979098250409"
+     }
+    },
+    "outputId": "a817c9bd-20a5-4399-87b2-4ca530084696"
+   },
+   "execution_count": null,
+   "outputs": []
+  },
+  {
+   "cell_type": "code",
+   "source": [
+    "f1_score(targets, predictions,average='micro')"
+   ],
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/"
+    },
+    "id": "je61MPhFDUHh",
+    "executionInfo": {
+     "status": "ok",
+     "timestamp": 1701532639896,
+     "user_tz": -180,
+     "elapsed": 13,
+     "user": {
+      "displayName": "Алексей Медведев",
+      "userId": "00285943979098250409"
+     }
+    },
+    "outputId": "e3c5ada6-7029-4b32-96bd-66ac8ff36433"
+   },
+   "execution_count": null,
+   "outputs": []
+  },
+  {
+   "cell_type": "code",
+   "source": [],
+   "metadata": {
+    "id": "JgxjdOlLDY-I"
+   },
+   "execution_count": null,
+   "outputs": []
+  }
+ ]
+}
