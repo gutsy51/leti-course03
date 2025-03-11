@@ -1,7 +1,14 @@
-LETI 3rd course subjects.
+# LETI 3rd course subjects.
 
-- `\db\` - Databases, coursework
-- `\iksis_plots\` - Info-Communication Systems and Networks, math scripts
-- `\llm\` - Large Language Models, practices
-- `\ml\` - Machine Learning basics, practices
-- `\web\` - Web Technologies, practices
+| Directory  | Description             | Status  |
+|------------|-------------------------|---------|
+| `/bd/ `    | Big Data                | Current |
+| `/db/ `    | PSQL Course Work        | Done    |
+| `/iksis/ ` | Network (math scripts)  | Done    |
+| `/llm/ `   | Large Language Models   | Current |
+| `/ml/ `    | Machine Learning Basics | Done    |
+| `/web/ `   | HTML/CSS                | Done    |
+
+### See also
+- [Backend practices](https://github.com/gutsy51/foodgram) (Yandex Practicum)
+- [Web project](https://github.com/gutsy51/ya-practicum-backend) (Yandex Practicum)
