@@ -7,6 +7,7 @@
 | `/iksis/ ` | Network (math scripts)  | Done    |
 | `/llm/ `   | Large Language Models   | Current |
 | `/ml/ `    | Machine Learning Basics | Done    |
+| `/mps/ `   | PSQL Scripts            | Current |
 | `/web/ `   | HTML/CSS                | Done    |
 
 ### See also
