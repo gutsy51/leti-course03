@@ -1,11 +1,22 @@
 /* ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ */
 
--- Проверка наличия цикла для в иерархии категории.
+-- Проверка наличия цикла в иерархии категории.
+/* Проверяет наличие цикла в иерархии вставляемой категории.
+    Вход:
+        p_child_id (integer): ID вставляемой категории,
+        p_parent_id (integer): ID родительской категории.
+    Выход:
+        void: Отсутствует.
+    Эффекты:
+        Вызывает ошибку при обнаружении цикла.
+    Требования:
+        Категории вставляемой и родительской категории должны быть различны.
+*/
 CREATE OR REPLACE FUNCTION check_category_cycle(
     p_child_id integer,
     p_parent_id integer
-)
-RETURNS void AS $$
+) RETURNS void AS
+$$
 DECLARE
     is_cycle boolean;
 BEGIN
@@ -33,11 +44,23 @@ $$ LANGUAGE plpgsql;
 /* ФУНКЦИИ СОЗДАНИЯ ЗАПИСЕЙ */
 
 -- Создать новую запись в таблице Единицы измерения.
+/* Добавляет новую запись в таблицу Единицы измерения, возвращает ID новой записи.
+    Вход:
+        p_name (character varying(64)): Название единицы измерения,
+        p_name_short (character varying(16)): Сокращение единицы измерения.
+    Выход:
+        integer: ID новой записи.
+    Эффекты:
+        Добавление новой ЕИ в таблицу Единицы измерения,
+        Вызов ошибки, если ЕИ с таким названием или сокращением уже существует,
+        Возврат ID новой записи.
+    Требования:
+        ЕИ не должна ранее существовать.
+*/
 CREATE OR REPLACE FUNCTION create_measure(
     p_name character varying(64),
     p_name_short character varying(16)
-)
-RETURNS integer AS
+) RETURNS integer AS
 $$
 DECLARE
     new_id integer;
@@ -55,12 +78,29 @@ $$ LANGUAGE plpgsql;
 
 
 -- Создать новую запись в таблице Категории.
+/* Добавляет новую запись в таблицу Категории, возвращает ID новой записи.
+    Вход:
+        p_name (character varying(128)): Название категории,
+        p_parent_id (integer): ID родительской категории (необязательный),
+        p_measure_id (integer): ID единицы измерения (по умолчанию 1 (штук)).
+    Выход:
+        integer: ID новой записи.
+    Эффекты:
+        Добавление новой Категории в таблицу Единицы измерения,
+        Вызов ошибки, если родительской категории не существует,
+        Вызов ошибки, если единицы измерения не существует,
+        Вызов ошибки, если категория уже существует,
+        Возврат ID новой записи.
+    Требования:
+        Родительская категория не должна ранее существовать,
+        Единица измерения не должна ранее существовать,
+        Категория не должна ранее существовать.
+*/
 CREATE OR REPLACE FUNCTION create_category(
     p_name character varying(128),
     p_parent_id integer DEFAULT NULL,
     p_measure_id integer DEFAULT 1
-)
-RETURNS integer AS
+) RETURNS integer AS
 $$
 DECLARE
     new_id integer;
@@ -91,12 +131,23 @@ $$ LANGUAGE plpgsql;
 
 
 -- Создать новую запись в таблице Изделия.
+/* Добавляет новую запись в таблицу Изделия, возвращает ID новой записи.
+    Вход:
+        p_name (character varying(128)): Название изделия,
+        p_category_id (integer): ID категории, в которую добавляется изделие.
+    Выход:
+        integer: ID новой записи.
+    Эффекты:
+        Добавление нового Изделия в таблицу Изделия,
+        Вызов ошибки, если родительской категории не существует,
+        Возврат ID новой записи.
+    Требования:
+        Родительская категория не должна ранее существовать,
+*/
 CREATE OR REPLACE FUNCTION create_product(
     p_name character varying(128),
-    p_category_id integer,
-    p_properties jsonb DEFAULT '{}'
-)
-RETURNS integer AS
+    p_category_id integer
+) RETURNS integer AS
 $$
 DECLARE
     new_id integer;
@@ -107,8 +158,8 @@ BEGIN
     END IF;
 
     -- Вставка.
-    INSERT INTO "Product" (name, category_id, properties)
-    VALUES (p_name, p_category_id, p_properties)
+    INSERT INTO "Product" (name, category_id)
+    VALUES (p_name, p_category_id)
     RETURNING id INTO new_id;
 
     RETURN new_id;
@@ -120,10 +171,23 @@ $$ language plpgsql;
 /* ФУНКЦИИ УДАЛЕНИЯ ЗАПИСЕЙ */
 
 -- Удаление записи из таблицы Единицы измерения.
+/* Удаляет существующую запись из таблицы Единицы измерения.
+    Вход:
+        p_id (integer): ID удаляемой записи.
+    Выход:
+        void: Отсутствует.
+    Эффекты:
+        Удаление записи из таблицы Единицы измерения,
+        Вызов ошибки, если ЕИ не существует,
+        Вызов ошибки, если ЕИ по умолчанию (id=1) не существует,
+        Установка значения по умолчанию Категориям, использовавшим данную ЕИ.
+    Требования:
+        ЕИ должна существовать,
+        ЕИ по умолчанию должна существовать,
+*/
 CREATE OR REPLACE FUNCTION delete_measure(
     p_id integer
-)
-RETURNS void AS
+) RETURNS void AS
 $$
 DECLARE
     is_used boolean;
@@ -154,10 +218,24 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Удаление записи из таблицы Категории.
+/* Удаляет существующую запись из таблицы Категории.
+    Вход:
+        p_id (integer): ID удаляемой записи.
+    Выход:
+        void: Отсутствует.
+    Эффекты:
+        Удаление записи из таблицы Категории,
+        Вызов ошибки, если Категория не существует,
+        Вызов ошибки, если существуют дочерние Категории,
+        Вызов ошибки, если существуют Изделия, принадлежащие данной Категории.
+    Требования:
+        Категория должна существовать,
+        Категория не должна содержать дочерних,
+        Категория не должна содержать изделий.
+*/
 CREATE OR REPLACE FUNCTION delete_category(
     p_id integer
-)
-RETURNS void AS
+) RETURNS void AS
 $$
 DECLARE
     has_children boolean;
@@ -183,7 +261,7 @@ BEGIN
         WHERE category_id = p_id
     ) INTO has_products;
     IF has_products THEN
-        RAISE EXCEPTION 'Нельзя удалить категорию с ID %, так как она содержит продукты', p_id;
+        RAISE EXCEPTION 'Нельзя удалить категорию с ID %, так как она содержит изделия', p_id;
     END IF;
 
     -- Удаление.
@@ -192,10 +270,20 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Удаление записи из таблицы Изделия.
+/* Удаляет существующую запись из таблицы Изделия.
+    Вход:
+        p_id (integer): ID удаляемой записи.
+    Выход:
+        void: Отсутствует.
+    Эффекты:
+        Удаление записи из таблицы Изделия,
+        Вызов ошибки, если Изделия не существует,
+    Требования:
+        Изделие должно существовать,
+*/
 CREATE OR REPLACE FUNCTION delete_product(
     p_id integer
-)
-RETURNS void AS
+) RETURNS void AS
 $$
 BEGIN
     -- Проверка существования.
@@ -213,6 +301,22 @@ $$ LANGUAGE plpgsql;
 /* ФУНКЦИИ ОБНОВЛЕНИЯ ЗАПИСЕЙ */
 
 -- Обновление записи в таблице Единицы измерения.
+/* Обновляет существующую запись в таблице Единицы измерения.
+    Вход:
+        p_id (integer): ID изменяемой записи,
+        p_name (character varying(64)): Новое название,
+        p_name_short (character varying(16)): Новое сокращение.
+    Выход:
+        void: Отсутствует.
+    Эффекты:
+        Обновление записи,
+        Вызов ошибки, если запись не существует,
+        Вызов ошибки, если запись с таким названием уже существует,
+        Вызов ошибки, если запись с таким сокращением уже существует,
+    Требования:
+        Запись должна существовать,
+        Обновленная запись не должна конфликтовать с существующими.
+*/
 CREATE OR REPLACE FUNCTION update_measure(
     p_id integer,
     p_name character varying(64) DEFAULT NULL,
@@ -250,6 +354,28 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Обновление записи в таблице Категории.
+/* Обновляет существующую запись в таблице Категории.
+    Вход:
+        p_id (integer): ID изменяемой записи,
+        p_name (character varying(128)): Новое название,
+        p_parent_id (integer): ID новой родительской категории,
+        p_measure_id (integer): ID новой единицы измерения.
+    Выход:
+        void: Отсутствует.
+    Эффекты:
+        Обновление записи,
+        Вызов ошибки, если запись не существует,
+        Вызов ошибки, если новой ЕИ не существует,
+        Вызов ошибки, если новая родительская категория создает цикл,
+        Вызов ошибки, если новая родительская и изменяемая категория одинаковы,
+        Вызов ошибки, если новой родительской категории не существует,
+    Требования:
+        Запись должна существовать,
+        Изменяемая ЕИ должна существовать,
+        Изменяемая родительская категория должна существовать,
+        Изменяемая родительская категория не должна быть родителем самой себе,
+        Изменяемая родительская категория не должна создавать циклов.
+*/
 CREATE OR REPLACE FUNCTION update_category(
     p_id integer,
     p_name character varying(128) DEFAULT NULL,
@@ -294,11 +420,25 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Обновление записи в таблице Изделия.
+/* Обновляет существующую запись в таблице Изделия.
+    Вход:
+        p_id (integer): ID изменяемой записи,
+        p_name (character varying(128)): Новое название,
+        p_category_id (integer): ID новой родительской категории,
+    Выход:
+        void: Отсутствует.
+    Эффекты:
+        Обновление записи,
+        Вызов ошибки, если запись не существует,
+        Вызов ошибки, если новой родительской категории не существует,
+    Требования:
+        Запись должна существовать,
+        Родительская категория должна существовать
+*/
 CREATE OR REPLACE FUNCTION update_product(
     p_id integer,
     p_name character varying(128) DEFAULT NULL,
-    p_category_id integer DEFAULT NULL,
-    p_properties jsonb DEFAULT NULL
+    p_category_id integer DEFAULT NULL
 ) RETURNS void AS
 $$
 BEGIN
@@ -315,8 +455,7 @@ BEGIN
     -- Обновление данных.
     UPDATE "Product" SET
         name = COALESCE(p_name, name),
-        category_id = COALESCE(p_category_id, category_id),
-        properties = COALESCE(p_properties, properties)
+        category_id = COALESCE(p_category_id, category_id)
     WHERE id = p_id;
 END;
 $$ LANGUAGE plpgsql;
@@ -326,15 +465,21 @@ $$ LANGUAGE plpgsql;
 /* ФУНКЦИИ ПОИСКА ЗАПИСЕЙ */
 
 -- Получение всех дочерних категорий.
-CREATE OR REPLACE FUNCTION get_all_children(
+/* Возвращает таблицу всех дочерних элементов (и категорий, и изделий) по идентификатору родительской.
+    Вход:
+        p_category_id (integer): ID родительской категории,
+    Выход:
+        TABLE: Таблица дочерних элементов.
+*/
+CREATE OR REPLACE FUNCTION get_all_descendants(
     p_category_id integer
-)
-RETURNS TABLE(
-    child_id integer,
-    child_name character varying(128),
-    child_parent_id integer,
-    child_measure_id integer,
-    depth_level integer
+) RETURNS TABLE(
+    id integer,
+    name character varying(128),
+    is_category bool,
+    parent_id integer,
+    measure_id integer,
+    depth integer
 ) AS
 $$
 BEGIN
@@ -344,6 +489,7 @@ BEGIN
         SELECT
             c.id,
             c.name,
+            true AS is_category,
             c.parent_id,
             c.measure_id,
             0 AS depth
@@ -356,25 +502,47 @@ BEGIN
         SELECT
             child.id,
             child.name,
+            true AS is_category,
             child.parent_id,
             child.measure_id,
             parent.depth + 1
         FROM "Category" child
         JOIN category_tree parent ON child.parent_id = parent.id
     )
+    -- Выбираем все дочерние категории (исключая исходную).
     SELECT
         ct.id,
         ct.name,
+        ct.is_category,
         ct.parent_id,
         ct.measure_id,
         ct.depth
     FROM category_tree ct
     WHERE ct.depth > 0
-    ORDER BY depth_level, name;
+
+    UNION ALL
+
+    -- Добавляем все изделия для найденных категорий.
+    SELECT
+        p.id,
+        p.name,
+        false as is_category,
+        p.category_id AS parent_id,
+        NULL AS measure_id,
+        ct.depth + 1 AS depth
+    FROM "Product" p
+    JOIN category_tree ct ON p.category_id = ct.id
+    ORDER BY depth, is_category, name;
 END;
 $$ LANGUAGE plpgsql;
 
 -- Получение всех родительских категорий.
+/* Возвращает таблицу всех родительских категорий по идентификатору дочерней.
+    Вход:
+        p_category_id (integer): ID дочерней категории,
+    Выход:
+        TABLE: Таблица родительских категорий.
+*/
 CREATE OR REPLACE FUNCTION get_all_parents(
     p_category_id integer
 )
@@ -424,6 +592,12 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Поиск всех терминальных классов заданной категории.
+/* Возвращает таблицу всех терминальных категорий по идентификатору родительской.
+    Вход:
+        p_category_id (integer): ID родительской категории,
+    Выход:
+        TABLE: Таблица терминальных категорий.
+*/
 CREATE OR REPLACE FUNCTION get_terminal_categories(
     p_category_id integer
 )

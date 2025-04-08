@@ -9,3 +9,4 @@ cmake-build-debug/
 **/runs/
 **/content/
 yolov8n.pt
+.ipynb_checkpoints/

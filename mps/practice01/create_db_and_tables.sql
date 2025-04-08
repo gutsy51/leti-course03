@@ -62,7 +62,6 @@ CREATE TABLE public."Product"
     id integer NOT NULL DEFAULT nextval('"Category_Product_id_seq"'),
     category_id integer NOT NULL,
     name character varying(128) NOT NULL,
-    properties jsonb,
     CONSTRAINT product_id PRIMARY KEY (id),
     CONSTRAINT product_category_id FOREIGN KEY (category_id)
         REFERENCES public."Category" (id) MATCH SIMPLE
