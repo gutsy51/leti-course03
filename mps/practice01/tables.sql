@@ -19,7 +19,7 @@ ALTER SEQUENCE public."Category_Product_id_seq"
 -- Создание таблицы "Единицы измерения".
 CREATE TABLE public."Measure"
 (
-    id integer NOT NULL DEFAULT nextval('"Category_Product_id_seq"'::regclass),
+    id serial NOT NULL,
     name character varying(64) NOT NULL,
     name_short character varying(16) NOT NULL,
     CONSTRAINT measure_id PRIMARY KEY (id),
@@ -34,7 +34,7 @@ ALTER TABLE IF EXISTS public."Measure"
 -- Создание таблицы "Категории".
 CREATE TABLE public."Category"
 (
-    id serial NOT NULL,
+    id integer NOT NULL DEFAULT nextval('"Category_Product_id_seq"'::regclass),
     name character varying(128) NOT NULL,
     parent_id integer,
     measure_id integer DEFAULT 1,
