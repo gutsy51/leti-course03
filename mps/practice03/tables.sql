@@ -164,3 +164,14 @@ CREATE TABLE public."ParameterValue"
     -- Проверка типов данных проводится в триггерах (есть под-запросы).
 );
 ALTER TABLE IF EXISTS public."ParameterValue" OWNER to postgres;
+
+
+-- Создание таблицы "Агрегатор".
+CREATE TABLE "ParameterAggregate" (
+    parent_param_id INTEGER NOT NULL,
+    param_id INTEGER NOT NULL,
+    PRIMARY KEY (parent_param_id, param_id),
+    FOREIGN KEY (parent_param_id) REFERENCES "Parameter"(id) ON DELETE CASCADE,
+    FOREIGN KEY (param_id) REFERENCES "Parameter"(id) ON DELETE CASCADE,
+    CONSTRAINT uq_param_aggregate_pair UNIQUE (parent_param_id, param_id)
+);

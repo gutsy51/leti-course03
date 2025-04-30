@@ -1202,7 +1202,7 @@ BEGIN
         JOIN "Category" c ON pcp.category_id = c.id
         WHERE c.parent_id IS NOT NULL
     ),
-    product_params AS ( -- Параметры изделий.
+    all_params AS ( -- Все параметры.
         SELECT
             p.id AS product_id,
             pv.param_id,
@@ -1213,8 +1213,7 @@ BEGIN
             pv.value_enum
         FROM "Product" p
         LEFT JOIN "ParameterValue" pv ON pv.product_id = p.id
-    ),
-    category_params AS ( -- Параметры категорий.
+        UNION ALL
         SELECT
             pcp.product_id,
             pv.param_id,
@@ -1225,11 +1224,12 @@ BEGIN
             pv.value_enum
         FROM product_category_path pcp
         JOIN "ParameterValue" pv ON pv.category_id = pcp.category_id
-    ),
-    all_params AS ( -- Все параметры.
-        SELECT * FROM product_params
-        UNION ALL
-        SELECT * FROM category_params
+        WHERE NOT EXISTS (  -- Если нет переопределения у изделия.
+            SELECT 1
+            FROM "ParameterValue" pv2
+            WHERE pv2.product_id = pcp.product_id
+              AND pv2.param_id = pv.param_id
+        )
     )
     SELECT
         c.id AS category_id,
@@ -1341,5 +1341,46 @@ BEGIN
         (pv.product_id = p_product_id) -- Параметры изделий.
         OR (pv.category_id IN (SELECT id FROM category_hierarchy)) -- Параметры категории и родителей.
     ORDER BY param.id;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Получить все изделия с параметрами заданного агрегата.
+CREATE OR REPLACE FUNCTION get_products_with_aggregate_params(p_parent_param_id integer)
+RETURNS TABLE (
+    category_id integer,
+    category character varying(128),
+    product_id integer,
+    product character varying(128),
+    amount integer,
+    measure character varying(16),
+    price numeric(11, 2),
+    param_id integer,
+    parent_param_name character varying(8),
+    param_name character varying(8),
+    param_type character varying(4),
+    param_value character varying(128),
+    param_measure character varying(16)
+) AS
+$$
+BEGIN
+    RETURN QUERY
+    SELECT
+        result.category_id,
+        result.category,
+        result.product_id,
+        result.product,
+        result.amount,
+        result.measure,
+        result.price,
+        result.param_id,
+        p_parent.name AS parent_param_name,
+        result.param_name,
+        result.param_type,
+        result.param_value,
+        result.param_measure
+    FROM get_all_products_with_params() AS result
+    JOIN "ParameterAggregate" pa ON pa.param_id = result.param_id
+    JOIN "Parameter" p_parent ON pa.parent_param_id = p_parent.id
+    WHERE pa.parent_param_id = p_parent_param_id;
 END;
 $$ LANGUAGE plpgsql;

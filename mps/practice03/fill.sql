@@ -19,14 +19,15 @@ DECLARE
     picture_id integer;
     length_id integer;
     length_of_head_id integer;
-    param_material_id integer;
-    param_length_id integer;
-    param_volume_id integer;
     enum_mat1_id integer;
     enum_mat2_id integer;
     enum_mat3_id integer;
     enum_len1_id integer;
     enum_len2_id integer;
+    tmp1_id integer;
+    tmp2_id integer;
+    tmp3_id integer;
+    tmp4_id integer;
 BEGIN
     RAISE NOTICE '=== ЗАПОЛНЕНИЕ ТАБЛИЦ ===';
 
@@ -76,15 +77,34 @@ BEGIN
     SELECT create_enum_value(length_of_head_id, 2, 1, null, 200, null, null) INTO enum_len2_id;
 
     -- Заполнение Параметров.
-    SELECT create_parameter(7, 'enum', 'Материал изделия', 'Материал', material_id) INTO param_material_id;
-    SELECT create_parameter(3, 'enum', 'Длина головки изделия', 'l', length_of_head_id) INTO param_length_id;
-    SELECT create_parameter(5, 'real', 'Объем изделия', 'V', null, 1, 100) INTO param_volume_id;
-
+--     SELECT  create_parameter(7, 'enum', 'Материал изделия',      'Материал', material_id) INTO param_material_id;
+--     PERFORM create_parameter(3, 'enum', 'Длина (тест)',          'L',        length_id);
+--     SELECT  create_parameter(3, 'enum', 'Длина головки изделия', 'l',        length_of_head_id) INTO param_length_id;
+--     SELECT  create_parameter(5, 'real', 'Объем изделия',         'V',        null, 1, 100) INTO param_volume_id;
+--
     -- Заполнение значений Параметров.
-    PERFORM create_parameter_value(param_material_id, 4,    null, enum_mat2_id, null, null, null, null);
-    PERFORM create_parameter_value(param_material_id, 5,    null, enum_mat3_id, null, null, null, null);
-    PERFORM create_parameter_value(param_length_id,   null, 1,    enum_len1_id, null, null, null, null);
-    PERFORM create_parameter_value(param_volume_id,   null, 6,    null,         null, null, 1.5,  null);
+--     PERFORM create_parameter_value(param_material_id, 4,    null, enum_mat2_id, null, null, null, null);
+--     PERFORM create_parameter_value(param_material_id, 5,    null, enum_mat3_id, null, null, null, null);
+--     PERFORM create_parameter_value(param_length_id,   null, 1,    enum_len1_id, null, null, null, null);
+--     PERFORM create_parameter_value(param_volume_id,   null, 6,    null,         null, null, 1.5,  null);
+--     PERFORM create_parameter_value(4,                 7,    null, null,         null, null, 2.5,  null);
+
+    SELECT  create_parameter(3, 'int', 'Размеры', '-') INTO tmp1_id;
+    SELECT  create_parameter(3, 'int', 'Длина', 'l') INTO tmp2_id;
+    SELECT  create_parameter(3, 'int', 'Ширина', 'w') INTO tmp3_id;
+    SELECT  create_parameter(3, 'int', 'Высота', 'h') INTO tmp4_id;
+
+    INSERT INTO "ParameterAggregate" VALUES
+        (tmp1_id, tmp2_id),
+        (tmp1_id, tmp3_id),
+        (tmp1_id, tmp4_id);
+
+    PERFORM create_parameter_value(tmp2_id, 4, null, null, null, 50, null, null);
+    PERFORM create_parameter_value(tmp3_id, 4, null, null, null, 75, null, null);
+    PERFORM create_parameter_value(tmp4_id, 4, null, null, null, 64, null, null);
+    PERFORM create_parameter_value(tmp2_id, 8, null, null, null, 14, null, null);
+    PERFORM create_parameter_value(tmp3_id, 8, null, null, null, 43, null, null);
+    PERFORM create_parameter_value(tmp4_id, 8, null, null, null, 39, null, null);
 
     RAISE NOTICE '=== ЗАПОЛНЕНИЕ ТАБЛИЦ ЗАВЕРШЕНО ===';
 END
