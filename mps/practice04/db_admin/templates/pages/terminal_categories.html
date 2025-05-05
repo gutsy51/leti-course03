@@ -9,33 +9,36 @@
     <button type="submit" class="btn btn-primary">Показать</button>
   </form>
 
-  {% if terminal_categories %}
-    <h2 class="mt-4">Найденные терминальные категории</h2>
-    <table class="table table-bordered mt-2">
-      <thead>
-      <tr>
-        <th>ID</th>
-        <th>Название</th>
-        <th>Родитель</th>
-        <th>Ед. измерения</th>
-        <th>Глубина</th>
-      </tr>
-      </thead>
-      <tbody>
-      {% for category in terminal_categories %}
+  {% if results %}
+    {% if terminal_categories %}
+      <h2 class="mt-4">Найденные терминальные категории</h2>
+      <table class="table table-bordered mt-2">
+        <thead>
         <tr>
-          <td>{{ category.id }}</td>
-          <td>{{ category.name }}</td>
-          <td>{{ category.parent_id }}</td>
-          <td>{{ category.measure_id }}</td>
-          <td>{{ category.depth }}</td>
+          <th>ID</th>
+          <th>Название</th>
+          <th>Родитель</th>
+          <th>Ед. измерения</th>
+          <th>Глубина</th>
         </tr>
-      {% endfor %}
-      </tbody>
-    </table>
-  {% else %}
-    <p class="mt-4">Нет терминальных категорий для выбранной категории.</p>
+        </thead>
+        <tbody>
+        {% for category in terminal_categories %}
+          <tr>
+            <td>{{ category.id }}</td>
+            <td>{{ category.name }}</td>
+            <td>{{ category.parent_id }}</td>
+            <td>{{ category.measure_id }}</td>
+            <td>{{ category.depth }}</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p class="mt-4">Нет терминальных категорий для выбранной категории.</p>
+    {% endif %}
   {% endif %}
-
+  
+  <br>
   <a href="{% url 'django_db_app:index' %}" class="btn btn-secondary mb-2">На главную</a>
 {% endblock %}

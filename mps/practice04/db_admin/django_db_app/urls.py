@@ -20,7 +20,7 @@ urlpatterns = [
     path('all_products_with_params/',
          views.AllProductsWithParamsView.as_view(),
          name='all_products_with_params'),
-    path('pruduct_params/',
+    path('product_params/',
          views.ProductParamsView.as_view(),
          name='product_params'),
     path('products_with_aggregate_params/',

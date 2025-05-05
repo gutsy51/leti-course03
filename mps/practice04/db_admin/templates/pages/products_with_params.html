@@ -10,39 +10,42 @@
   </form>
 
   {% if results %}
-    <table class="table table-bordered table-striped">
-      <thead>
-      <tr>
-        <th>Категория</th>
-        <th>Изделие</th>
-        <th>Количество</th>
-        <th>Ед. изм.</th>
-        <th>Цена</th>
-        <th>Параметр</th>
-        <th>Тип</th>
-        <th>Значение</th>
-        <th>Ед. изм. параметра</th>
-      </tr>
-      </thead>
-      <tbody>
-      {% for row in results %}
+    {% if products %}
+      <table class="table table-bordered table-striped">
+        <thead>
         <tr>
-          <td>{{ row.category }}</td>
-          <td>{{ row.product }}</td>
-          <td>{{ row.amount }}</td>
-          <td>{{ row.measure }}</td>
-          <td>{{ row.price }}</td>
-          <td>{{ row.param_name }}</td>
-          <td>{{ row.param_type }}</td>
-          <td>{{ row.param_value }}</td>
-          <td>{{ row.param_measure }}</td>
+          <th>Категория</th>
+          <th>Изделие</th>
+          <th>Количество</th>
+          <th>Ед. изм.</th>
+          <th>Цена</th>
+          <th>Параметр</th>
+          <th>Тип</th>
+          <th>Значение</th>
+          <th>Ед. изм. параметра</th>
         </tr>
-      {% endfor %}
-      </tbody>
-    </table>
-  {% else %}
-    <p>Нет данных для отображения.</p>
+        </thead>
+        <tbody>
+        {% for row in products %}
+          <tr>
+            <td>{{ row.category }}</td>
+            <td>{{ row.product }}</td>
+            <td>{{ row.amount }}</td>
+            <td>{{ row.measure }}</td>
+            <td>{{ row.price }}</td>
+            <td>{{ row.param_name }}</td>
+            <td>{{ row.param_type }}</td>
+            <td>{{ row.param_value }}</td>
+            <td>{{ row.param_measure }}</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p>Нет данных для отображения.</p>
+    {% endif %}
   {% endif %}
   
+  <br>
   <a href="{% url 'django_db_app:index' %}" class="btn btn-secondary mb-2">На главную</a>
 {% endblock %}

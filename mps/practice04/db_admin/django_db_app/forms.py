@@ -17,7 +17,7 @@ class ProductSelectForm(forms.Form):
         queryset=Product.objects.all(),
         label='Выберите продукт',
         required=True,
-        empty_label="Не выбрано"
+        empty_label="Не выбрано",
     )
 
 

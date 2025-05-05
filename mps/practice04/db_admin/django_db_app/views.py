@@ -17,6 +17,11 @@ class DescendantsByCategoryView(LoginRequiredMixin, PermissionRequiredMixin,
     template_name = 'pages/descendants_by_category.html'
     form_class = CategorySelectForm
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['results'] = False  # До отправки формы не показываем таблицы.
+        return context
+
     def form_valid(self, form):
         category = form.cleaned_data['category']
         all_categories = Category.objects.all().values('id', 'parent_id')
@@ -42,6 +47,7 @@ class DescendantsByCategoryView(LoginRequiredMixin, PermissionRequiredMixin,
             'descendant_categories': descendant_categories,
             'descendant_products': descendant_products,
             'selected_category': category,
+            'results': True,
         })
 
 
@@ -73,6 +79,7 @@ class ParentsByCategoryView(LoginRequiredMixin, PermissionRequiredMixin,
             'form': form,
             'selected_category': category,
             'parent_categories': parent_chain[::-1],  # От корня к выбранной.
+            'results': True,
         })
 
 
@@ -123,6 +130,7 @@ class TerminalCategoriesView(LoginRequiredMixin, PermissionRequiredMixin,
             'form': form,
             'selected_category': selected_category,
             'terminal_categories': terminal_categories,
+            'results': True,
         })
 
 
@@ -208,24 +216,23 @@ class ProductsWithParamsView(LoginRequiredMixin, PermissionRequiredMixin,
         return render(self.request, self.template_name, {
             'form': form,
             'selected_category': selected_category,
-            'results': results,
+            'products': results,
+            'results': True,
         })
 
 
-class AllProductsWithParamsView(LoginRequiredMixin, PermissionRequiredMixin, TemplateView):
+class AllProductsWithParamsView(LoginRequiredMixin, PermissionRequiredMixin,
+                                TemplateView):
     permission_required = 'django_db_app.view_product'
     template_name = 'pages/all_products_with_params.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        # Получаем корневую категорию (category_id = 1).
-        root_category = get_object_or_404(Category, id=1)
-
         # Получаем все продукты, которые принадлежат корневой категории.
-        products = Product.objects.filter(
-            category=root_category
-        ).select_related('category', 'category__measure')
+        products = Product.objects.all().select_related(
+            'category', 'category__measure'
+        )
 
         results = []
 
@@ -305,26 +312,30 @@ class ProductParamsView(LoginRequiredMixin, PermissionRequiredMixin,
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        form = ProductSelectForm(self.request.GET)
-
-        product = None
-        params = []
-
-        if form.is_valid():
-            product = form.cleaned_data['product']  # уже объект.
-
-            # Получаем параметры продукта
-            params = ParameterValue.objects.filter(
-                product=product
-            ).select_related('param', 'param__measure', 'value_enum')
+        if 'product' in self.request.GET:
+            form = ProductSelectForm(self.request.GET)
+            if form.is_valid():
+                product = form.cleaned_data['product']
+                params = ParameterValue.objects.filter(
+                    product=product
+                ).select_related('param', 'param__measure', 'value_enum')
+            else:
+                product = None
+                params = []
+        else:
+            form = ProductSelectForm()
+            product = None
+            params = []
 
         context['form'] = form
         context['product'] = product
         context['params'] = params
+        context['results'] = bool(product)
 
         if product and not params:
-            context['no_params_message'] = ("Параметры для выбранного "
-                                            "продукта не найдены.")
+            context['no_params_message'] = (
+                "Параметры для выбранного продукта не найдены."
+            )
 
         return context
 
@@ -336,28 +347,27 @@ class ProductsWithAggregateParamsView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        # Создаем форму для получения параметра parent_param_id из GET-запроса.
-        form = ParentParamForm(self.request.GET)
-        context['form'] = form
-
-        # Проверяем, валидна ли форма
-        if form.is_valid():
-            parent_param_id = form.cleaned_data['parent_param_id']
+        if 'parent_param_id' in self.request.GET:
+            form = ParentParamForm(self.request.GET)
+            if form.is_valid():
+                parent_param_id = form.cleaned_data['parent_param_id']
+            else:
+                parent_param_id = None
         else:
+            form = ParentParamForm()  # пустая форма
             parent_param_id = None
 
-        # Если параметр не передан или форма невалидна, вызываем ошибку.
-        # if parent_param_id is None:
-        #     raise Http404("Не указан идентификатор родительского параметра.")
+        context['form'] = form
 
-        # Получаем все продукты и их параметры.
         products_with_params = self.get_products_with_params()
 
-        # Фильтруем параметры, связанные с родительским параметром.
         aggregate_params = self.filter_params_by_aggregate(products_with_params,
-                                                           parent_param_id)
+                                                           parent_param_id) \
+            if parent_param_id else []
 
         context['aggregate_params'] = aggregate_params
+        context['results'] = bool(aggregate_params)
+
         return context
 
     def get_products_with_params(self):
@@ -388,7 +398,8 @@ class ProductsWithAggregateParamsView(TemplateView):
             ).select_related('param', 'param__measure', 'value_enum')
 
             # Объединяем параметры продукта и наследуемые параметры.
-            combined_params = product_param_values + list(inherited_param_values)
+            combined_params = (product_param_values +
+                               list(inherited_param_values))
 
             for pv in combined_params:
                 param = pv.param
