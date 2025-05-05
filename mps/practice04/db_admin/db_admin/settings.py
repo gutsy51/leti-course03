@@ -54,6 +54,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'db_admin.wsgi.application'
 
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # Database definition.
 DATABASES = {
