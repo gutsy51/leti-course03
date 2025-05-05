@@ -10,6 +10,52 @@ class IndexView(TemplateView):
     template_name = 'pages/index.html'
 
 
+class ClassifierView(LoginRequiredMixin, PermissionRequiredMixin, TemplateView):
+    permission_required = 'django_db_app.view_category'
+    template_name = 'pages/classifier.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        categories = Category.objects.filter(is_enum=False)
+        products = Product.objects.all()
+
+        category_map = {}
+        for cat in categories:
+            category_map.setdefault(cat.parent_id, []).append(cat)
+
+        product_map = {}
+        for prod in products:
+            product_map.setdefault(prod.category_id, []).append(prod)
+
+        def build_lines(counter, parent_id=None, level=0):
+            children = category_map.get(parent_id, [])
+            for category in sorted(children, key=lambda c: c.name):
+                counter += 1
+                lines.append({
+                    'id': counter,
+                    'name': category.name,
+                    'level': level,
+                    'is_product': False
+                })
+                for product in sorted(product_map.get(category.id, []),
+                                      key=lambda p: p.name):
+                    counter += 1
+                    lines.append({
+                        'id': counter,
+                        'name': product.name,
+                        'level': level + 1,
+                        'is_product': True
+                    })
+                counter = build_lines(counter, category.id, level + 1)
+            return counter
+
+        lines = []
+        build_lines(counter=0)
+        context['results'] = lines
+        return context
+
+
 class DescendantsByCategoryView(LoginRequiredMixin, PermissionRequiredMixin,
                                 FormView):
     permission_required = 'django_db_app.view_category'

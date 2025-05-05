@@ -5,6 +5,9 @@ app_name = 'django_db_app'
 
 urlpatterns = [
     path('', views.IndexView.as_view(), name='index'),
+    path('classifier/',
+         views.ClassifierView.as_view(),
+         name='classifier'),
     path('descendants_by_category/',
          views.DescendantsByCategoryView.as_view(),
          name='descendants_by_category'),
